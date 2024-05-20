@@ -10,5 +10,6 @@ import { History, HistorySchema } from './schemas/history.schema';
   ],
   controllers: [HistoryController],
   providers: [HistoryService],
+  exports: [HistoryService],
 })
 export class HistoryModule {}
