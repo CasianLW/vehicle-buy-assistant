@@ -5,6 +5,8 @@ import { VehicleModule } from './vehicle/vehicle.module';
 import { HistoryModule } from './history/history.module';
 import { AppConfigModule } from './config/config.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { LeboncoinService } from './scrapers/leboncoin/leboncoin.service';
+import { LeboncoinController } from './scrapers/leboncoin/leboncoin.controller';
 
 @Module({
   imports: [
@@ -13,7 +15,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     VehicleModule,
     HistoryModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, LeboncoinController],
+  providers: [AppService, LeboncoinService],
 })
 export class AppModule {}
