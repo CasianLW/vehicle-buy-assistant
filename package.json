@@ -30,6 +30,7 @@
     "axios": "^1.7.1",
     "cheerio": "^1.0.0-rc.12",
     "mongoose": "^8.4.0",
+    "openai": "^4.47.3",
     "puppeteer": "^22.9.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
