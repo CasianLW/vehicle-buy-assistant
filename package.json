@@ -29,7 +29,6 @@
     "@nestjs/platform-express": "^10.0.0",
     "axios": "^1.7.1",
     "cheerio": "^1.0.0-rc.12",
-    "leboncoin-api-search": "^0.0.7",
     "mongoose": "^8.4.0",
     "puppeteer": "^22.9.0",
     "reflect-metadata": "^0.2.0",
