@@ -11,6 +11,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { LeboncoinService } from './leboncoin/leboncoin.service';
 import { VehiclesController } from './vehicles/vehicles.controller';
 import { LeboncoinModule } from './leboncoin/leboncoin.module';
+import { MobiledeCarsService } from './mobilede-cars/mobilede-cars.service';
+import { MobiledeCarsController } from './mobilede-cars/mobilede-cars.controller';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { LeboncoinModule } from './leboncoin/leboncoin.module';
     HistoryModule,
     LeboncoinModule,
   ],
-  controllers: [AppController, VehiclesController],
-  providers: [AppService, LeboncoinService],
+  controllers: [AppController, VehiclesController, MobiledeCarsController],
+  providers: [AppService, LeboncoinService, MobiledeCarsService],
 })
 export class AppModule {}
