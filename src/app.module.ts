@@ -10,6 +10,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 // maybe used to scrap other websites later
 import { MobiledeCarsService } from './mobilede-cars/mobilede-cars.service';
 import { MobiledeCarsController } from './mobilede-cars/mobilede-cars.controller';
+import { AppSettingsController } from './app-settings/app-settings.controller';
+import { AppSettingsModule } from './app-settings/app-settings.module';
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import { MobiledeCarsController } from './mobilede-cars/mobilede-cars.controller
     MongooseModule.forRoot(process.env.MONGO_URI),
     VehicleModule,
     HistoryModule,
+    AppSettingsModule,
   ],
-  controllers: [AppController, MobiledeCarsController],
+  controllers: [AppController, MobiledeCarsController, AppSettingsController],
   providers: [AppService, MobiledeCarsService],
 })
 export class AppModule {}
