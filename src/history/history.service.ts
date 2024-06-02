@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { History } from './schemas/history.schema';
+import { History } from '../schemas/history.schema';
 
 @Injectable()
 export class HistoryService {
@@ -11,9 +11,13 @@ export class HistoryService {
 
   async createHistory(
     userId: string,
+    userLogged: boolean,
     prompt: string,
     response: string,
   ): Promise<History> {
+    if (!userLogged) {
+      return;
+    }
     const newHistory = new this.historyModel({ userId, prompt, response });
     return newHistory.save();
   }
