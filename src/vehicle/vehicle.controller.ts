@@ -7,11 +7,13 @@ export class VehicleController {
 
   @Post('process')
   async processPrompt(
-    @Body() body: { userId?: string; service: string; prompt: string },
+    @Body() body: { userId?: string; userLogged: boolean; prompt: string },
+    // @Body() body: { userId?: string; service: string; prompt: string },
   ) {
     return this.vehicleService.processPrompt(
       body.userId,
-      body.service,
+      body.userLogged,
+      // body.service,
       body.prompt,
     );
   }
