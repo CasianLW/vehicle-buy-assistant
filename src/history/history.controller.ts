@@ -7,10 +7,17 @@ export class HistoryController {
 
   @Post()
   async create(
-    @Body() body: { userId: string; prompt: string; response: string },
+    @Body()
+    body: {
+      userId: string;
+      userLogged: boolean;
+      prompt: string;
+      response: string;
+    },
   ) {
     return this.historyService.createHistory(
       body.userId,
+      body.userLogged,
       body.prompt,
       body.response,
     );
