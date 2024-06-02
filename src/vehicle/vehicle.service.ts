@@ -7,6 +7,9 @@ import Anthropic from '@anthropic-ai/sdk';
 import claudeMessage from './ai-instructions/claude-message';
 import mistralMessage from './ai-instructions/mistral-message';
 import OpenAI from 'openai';
+import { AppSettingsService } from 'src/app-settings/app-settings.service';
+import visitorMessage from './ai-instructions/visitor-message';
+import openaiMessage from './ai-instructions/openai-message';
 
 @Injectable()
 export class VehicleService {
@@ -18,6 +21,7 @@ export class VehicleService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly historyService: HistoryService,
+    private readonly appSettingsService: AppSettingsService,
   ) {
     const claudeApiKey = this.configService.get<string>('CLAUDE_API_KEY');
     this.anthropic = new Anthropic({ apiKey: claudeApiKey });
@@ -25,13 +29,22 @@ export class VehicleService {
     this.openai = new OpenAI({ apiKey: openAiKey });
   }
 
-  private async fetchOpenAIResponse(prompt: string): Promise<string> {
+  private async fetchOpenAIResponse(
+    prompt: string,
+    userLogged: boolean,
+  ): Promise<string> {
     this.logger.debug(`Fetching OpenAI response for prompt: ${prompt}`);
     try {
+      const settings = await this.appSettingsService.getAppSettings();
+      const model = settings.modelForOpenAI || 'gpt-3.5-turbo';
       const completion = await this.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: model,
+        // model: 'gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: mistralMessage },
+          {
+            role: 'system',
+            content: userLogged ? openaiMessage : visitorMessage,
+          },
           { role: 'user', content: prompt },
         ],
         max_tokens: 2000,
@@ -57,19 +70,28 @@ export class VehicleService {
     }
   }
 
-  private async fetchMistralAIResponse(prompt: string): Promise<string> {
+  private async fetchMistralAIResponse(
+    prompt: string,
+    userLogged: boolean,
+  ): Promise<string> {
     const mistralAiKey = this.configService.get<string>('MISTRAL_API_KEY');
     this.logger.debug(`Fetching Mistral AI response for prompt: ${prompt}`);
     try {
+      const settings = await this.appSettingsService.getAppSettings();
+      const model = settings.modelForMistral || 'open-mistral-7b';
       const response = await lastValueFrom(
         this.httpService.post(
           'https://api.mistral.ai/v1/chat/completions',
           {
-            model: 'open-mistral-7b',
+            model: model,
+            // model: 'open-mistral-7b',
             // model: 'open-mixtral-8x7b',
             // model: 'open-mixtral-8x22b',
             messages: [
-              { role: 'system', content: mistralMessage },
+              {
+                role: 'system',
+                content: userLogged ? mistralMessage : visitorMessage,
+              },
               { role: 'user', content: prompt },
             ],
             max_tokens: 2000, // Increase the token limit if needed
@@ -106,17 +128,23 @@ export class VehicleService {
     }
   }
 
-  private async fetchClaudeAIResponse(prompt: string): Promise<string> {
+  private async fetchClaudeAIResponse(
+    prompt: string,
+    userLogged: boolean,
+  ): Promise<string> {
     this.logger.debug(`Fetching Claude AI response for prompt: ${prompt}`);
     try {
+      const settings = await this.appSettingsService.getAppSettings();
+      const model = settings.modelForClaude || 'claude-3-haiku-20240307';
       const response = await this.anthropic.messages.create({
-        model: 'claude-3-haiku-20240307',
+        model: model,
+        // model: 'claude-3-haiku-20240307',
         // model: 'claude-3-sonnet-20240229',
         // model: 'claude-3-opus-20240229',
         max_tokens: 2000,
         temperature: 0,
         // system: mistralMessage,
-        system: claudeMessage,
+        system: userLogged ? claudeMessage : visitorMessage,
         messages: [
           {
             role: 'user',
@@ -144,13 +172,16 @@ export class VehicleService {
     }
   }
 
-  async fetchAIResponse(service: string, prompt: string): Promise<string> {
+  // async fetchAIResponse(service: string, prompt: string): Promise<string> {
+  async fetchAIResponse(prompt: string, userLogged: boolean): Promise<string> {
+    const settings = await this.appSettingsService.getAppSettings();
+    const service = settings.aiSelected;
     if (service === 'openai') {
-      return this.fetchOpenAIResponse(prompt);
+      return this.fetchOpenAIResponse(prompt, userLogged);
     } else if (service === 'mistral') {
-      return this.fetchMistralAIResponse(prompt);
+      return this.fetchMistralAIResponse(prompt, userLogged);
     } else if (service === 'claude') {
-      return this.fetchClaudeAIResponse(prompt);
+      return this.fetchClaudeAIResponse(prompt, userLogged);
     } else {
       throw new Error('Unsupported AI service');
     }
@@ -158,13 +189,20 @@ export class VehicleService {
 
   async processPrompt(
     userId: string,
-    service: string,
+    userLogged: boolean,
+    // service: string,
     prompt: string,
   ): Promise<string> {
     try {
-      const aiResponse = await this.fetchAIResponse(service, prompt);
+      // const aiResponse = await this.fetchAIResponse(service, prompt);
+      const aiResponse = await this.fetchAIResponse(prompt, userLogged);
       if (userId) {
-        await this.historyService.createHistory(userId, prompt, aiResponse);
+        await this.historyService.createHistory(
+          userId,
+          userLogged,
+          prompt,
+          aiResponse,
+        );
       }
       return aiResponse;
     } catch (error) {
