@@ -12,6 +12,13 @@ import { MobiledeCarsService } from './mobilede-cars/mobilede-cars.service';
 import { MobiledeCarsController } from './mobilede-cars/mobilede-cars.controller';
 import { AppSettingsController } from './app-settings/app-settings.controller';
 import { AppSettingsModule } from './app-settings/app-settings.module';
+// import { UserController } from './user/user.controller';
+// import { UserService } from './user/user.service';
+// import { AuthService } from './auth/auth.service';
+// import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { UserController } from './user/user.controller';
 
 @Module({
   imports: [
@@ -20,8 +27,17 @@ import { AppSettingsModule } from './app-settings/app-settings.module';
     VehicleModule,
     HistoryModule,
     AppSettingsModule,
+    AuthModule,
+    UserModule,
   ],
-  controllers: [AppController, MobiledeCarsController, AppSettingsController],
+  controllers: [
+    AppController,
+    MobiledeCarsController,
+    AppSettingsController,
+    UserController,
+    // AuthController,
+  ],
   providers: [AppService, MobiledeCarsService],
+  // providers: [AppService, MobiledeCarsService, UserService, AuthService],
 })
 export class AppModule {}
