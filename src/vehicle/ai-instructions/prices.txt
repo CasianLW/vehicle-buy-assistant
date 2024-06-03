@@ -7,7 +7,7 @@ open-mixtral-8x7b
 0.00143€ - per api request, avec format reponse 
 0.01€ - per api request, avec format reponse toutes et les modeles en contexte
 open-mistral-7b - 1298
-0.000476€ - per api request, avec format reponse 
+0.000476€ - per api request, avec format reponse
 0.0025€ - per api request, avec format reponse toutes et les modeles en contexte
 
 Observations, avec les modeles le format a tendance a casser et ne fonctionne pas bien
