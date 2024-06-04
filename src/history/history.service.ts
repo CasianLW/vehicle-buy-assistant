@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { History } from '../schemas/history.schema';
@@ -16,13 +20,29 @@ export class HistoryService {
     response: string,
   ): Promise<History> {
     if (!userLogged) {
-      return;
+      throw new BadRequestException(
+        'User must be logged in to create history.',
+      );
     }
-    const newHistory = new this.historyModel({ userId, prompt, response });
+    if (!userId || !prompt || !response) {
+      throw new BadRequestException('Missing required fields.');
+    }
+    const newHistory = await this.historyModel.create({
+      userId,
+      prompt,
+      response,
+    });
     return newHistory.save();
   }
 
   async getHistoryByUserId(userId: string): Promise<History[]> {
-    return this.historyModel.find({ userId }).exec();
+    if (!userId) {
+      throw new BadRequestException('User ID is required.');
+    }
+    const history = await this.historyModel.find({ userId }).exec();
+    if (!history.length) {
+      throw new NotFoundException('No history found for the provided user ID.');
+    }
+    return history;
   }
 }
