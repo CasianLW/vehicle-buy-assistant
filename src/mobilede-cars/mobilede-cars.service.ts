@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
@@ -14,7 +18,9 @@ export class MobiledeCarsService {
   ): Promise<any> {
     // Ensure required parameters are present
     if (!make || !model || !year) {
-      throw new Error('Make, model, and year are required parameters.');
+      throw new BadRequestException(
+        'Make, model, and year are required parameters.',
+      );
     }
 
     // Construct the base URL with make, model, and default filters
@@ -86,7 +92,7 @@ export class MobiledeCarsService {
       };
     } catch (error) {
       console.error(`There was an error fetching the data: ${error}`);
-      throw new Error('Failed to fetch cars');
+      throw new InternalServerErrorException('Failed to fetch cars');
     }
   }
 }
