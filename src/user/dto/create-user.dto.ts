@@ -2,17 +2,21 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
+  @MinLength(3)
+  @MaxLength(20)
   username: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(6)
   password: string;
 
   @IsString()
@@ -21,10 +25,15 @@ export class CreateUserDto {
   email: string;
 
   @IsArray()
-  @IsOptional()
-  readonly roles?: string[];
+  @IsNotEmpty()
+  readonly roles: string[];
 
-  isBanned?: boolean;
-  isPremium?: boolean;
+  @IsNotEmpty()
+  isBanned: boolean;
+
+  @IsNotEmpty()
+  isPremium: boolean;
 }
-//   isAdmin?: boolean;
+// isAdmin?: boolean;
+// isBanned?: boolean;
+// isPremium?: boolean;
