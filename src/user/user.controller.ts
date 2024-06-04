@@ -12,6 +12,8 @@ import {
   NotFoundException,
   HttpCode,
   HttpStatus,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Roles } from '../auth/roles.decorator';
@@ -29,6 +31,7 @@ export class UserController {
   @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   async create(@Body() createUserDto: CreateUserDto) {
     try {
       const user = await this.userService.create(createUserDto);
@@ -67,6 +70,7 @@ export class UserController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     try {
       const user = await this.userService.update(id, updateUserDto);
