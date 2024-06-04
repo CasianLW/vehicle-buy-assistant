@@ -4,7 +4,7 @@ import { VehicleController } from './vehicle.controller';
 import { HistoryModule } from '../history/history.module';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
-import { AppSettingsModule } from 'src/app-settings/app-settings.module';
+import { AppSettingsModule } from '../app-settings/app-settings.module';
 
 @Module({
   imports: [HttpModule, ConfigModule, HistoryModule, AppSettingsModule],
