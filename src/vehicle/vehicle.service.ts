@@ -7,7 +7,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import claudeMessage from './ai-instructions/claude-message';
 import mistralMessage from './ai-instructions/mistral-message';
 import OpenAI from 'openai';
-import { AppSettingsService } from 'src/app-settings/app-settings.service';
+import { AppSettingsService } from '../app-settings/app-settings.service';
 import visitorMessage from './ai-instructions/visitor-message';
 import openaiMessage from './ai-instructions/openai-message';
 
@@ -29,7 +29,7 @@ export class VehicleService {
     this.openai = new OpenAI({ apiKey: openAiKey });
   }
 
-  private async fetchOpenAIResponse(
+  public async fetchOpenAIResponse(
     prompt: string,
     userLogged: boolean,
   ): Promise<string> {
@@ -70,7 +70,7 @@ export class VehicleService {
     }
   }
 
-  private async fetchMistralAIResponse(
+  public async fetchMistralAIResponse(
     prompt: string,
     userLogged: boolean,
   ): Promise<string> {
@@ -128,7 +128,7 @@ export class VehicleService {
     }
   }
 
-  private async fetchClaudeAIResponse(
+  public async fetchClaudeAIResponse(
     prompt: string,
     userLogged: boolean,
   ): Promise<string> {
