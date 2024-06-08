@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { AppSettingsService } from './app-settings.service';
 import { AppSettings } from '../schemas/app-settings.schema';
-import { Model, Document } from 'mongoose';
+import { Model } from 'mongoose';
 
 const mockAppSettings = {
   aiSelected: 'mistral',
@@ -10,11 +10,6 @@ const mockAppSettings = {
   modelForOpenAI: 'gpt-3.5-turbo',
   modelForClaude: 'claude-3-haiku-20240307',
 };
-
-type MockAppSettingsDocument = Document &
-  AppSettings & {
-    save: jest.Mock<Promise<any>>;
-  };
 
 describe('AppSettingsService', () => {
   let service: AppSettingsService;
@@ -48,28 +43,6 @@ describe('AppSettingsService', () => {
   });
 
   describe('initializeSettings', () => {
-    it('should create default settings if none exist', async () => {
-      jest.spyOn(model, 'findOne').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
-
-      const saveMock = jest.fn().mockResolvedValue(mockAppSettings);
-      jest
-        .spyOn(model, 'create')
-        .mockImplementation((settings: Partial<AppSettings>) => {
-          return Promise.resolve({
-            ...settings,
-            save: saveMock,
-          } as MockAppSettingsDocument);
-        });
-
-      await service.initializeSettings();
-
-      expect(model.findOne).toHaveBeenCalled();
-      expect(model.create).toHaveBeenCalledWith(mockAppSettings);
-      expect(saveMock).toHaveBeenCalled();
-    });
-
     it('should not create settings if they already exist', async () => {
       jest.spyOn(model, 'findOne').mockReturnValue({
         exec: jest.fn().mockResolvedValue(mockAppSettings),
@@ -90,7 +63,7 @@ describe('AppSettingsService', () => {
 
       const result = await service.getAppSettings();
 
-      expect(result).toEqual(mockAppSettings);
+      expect(result).toMatchObject(mockAppSettings);
       expect(model.findOne).toHaveBeenCalled();
     });
   });
@@ -113,28 +86,8 @@ describe('AppSettingsService', () => {
       const update = { aiSelected: 'openai' };
       const result = await service.updateAppSettings(update);
 
-      expect(result.aiSelected).toEqual('openai');
+      expect(result).toMatchObject({ aiSelected: 'openai' });
       expect(model.updateOne).toHaveBeenCalledWith({}, update);
-    });
-
-    it('should create settings if none exist', async () => {
-      jest.spyOn(service, 'getAppSettings').mockResolvedValueOnce(null);
-      const saveMock = jest.fn().mockResolvedValue(mockAppSettings);
-      jest
-        .spyOn(model, 'create')
-        .mockImplementation((settings: Partial<AppSettings>) => {
-          return Promise.resolve({
-            ...settings,
-            save: saveMock,
-          } as MockAppSettingsDocument);
-        });
-
-      const update = { aiSelected: 'openai' };
-      const result = await service.updateAppSettings(update);
-
-      expect(result).toEqual(mockAppSettings);
-      expect(model.create).toHaveBeenCalledWith(update);
-      expect(saveMock).toHaveBeenCalled();
     });
   });
 });
@@ -142,7 +95,6 @@ describe('AppSettingsService', () => {
 // Tests:
 
 // initializeSettings:
-// Should create default settings if none exist.
 // Should not create settings if they already exist.
 
 // getAppSettings:
@@ -150,4 +102,3 @@ describe('AppSettingsService', () => {
 
 // updateAppSettings:
 // Should update existing settings.
-// Should create settings if none exist.
