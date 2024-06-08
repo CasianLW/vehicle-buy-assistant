@@ -125,9 +125,17 @@ describe('AuthService', () => {
         isBanned: false,
         isPremium: false,
       };
-      jest
-        .spyOn(userService, 'findByUsername')
-        .mockResolvedValue(createUserDto);
+
+      const existingUser = {
+        username: 'existinguser',
+        email: 'existing@example.com',
+        password: 'hashedpassword',
+        roles: ['user'],
+        isBanned: false,
+        isPremium: false,
+      };
+
+      jest.spyOn(userService, 'findByUsername').mockResolvedValue(existingUser);
 
       await expect(service.register(createUserDto)).rejects.toThrow(
         ConflictException,
