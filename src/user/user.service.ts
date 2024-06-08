@@ -24,6 +24,8 @@ export class UserService {
       ],
     });
     if (existingUser) {
+      // console.error('Existing user:', existingUser); // Log existing user
+      // console.log('All users:', await this.userModel.find()); // Log all users
       throw new ConflictException('Username or email already exists');
     }
 
