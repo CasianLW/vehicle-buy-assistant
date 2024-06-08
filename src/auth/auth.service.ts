@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -21,7 +20,7 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload: JwtPayload = {
+    const payload = {
       username: user.username,
       sub: user._id,
       roles: user.roles,
@@ -32,6 +31,13 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto) {
+    const existingUser = await this.userService.findByUsername(
+      createUserDto.username,
+    );
+    if (existingUser) {
+      throw new ConflictException('Username already exists');
+    }
+
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
     createUserDto.password = hashedPassword;
