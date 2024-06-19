@@ -5,6 +5,8 @@ import { Document } from 'mongoose';
 export class Vehicle extends Document {
   @Prop({ required: true })
   make: string;
+  @Prop({ required: true })
+  makeId: string;
 
   @Prop({ required: true })
   carModel: string;
@@ -12,20 +14,25 @@ export class Vehicle extends Document {
   @Prop({ required: true })
   year: number;
 
-  @Prop()
-  fuelType: string;
+  @Prop({ required: true })
+  price: number;
 
   @Prop()
-  usageFrequency: number;
+  fuelType: string;
+  @Prop()
+  consumption: number;
+  @Prop()
+  fuelCost: number;
 
   @Prop()
   maintenanceCost: number;
-
+  @Prop()
+  registrationCost: number;
   @Prop()
   insuranceCost: number;
 
   @Prop()
-  additionalFeatures: string[];
+  description: string;
 }
 
 export const VehicleSchema = SchemaFactory.createForClass(Vehicle);
