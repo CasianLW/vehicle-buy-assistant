@@ -3352,7 +3352,8 @@ Example:
     "annual_maintenance": 500, 
     "registration_cost": 250, 
     "estimated_insurance": 700, 
-    "max_km":2000000
+    "max_km":2000000,
+    "description":"A short description (max 40 words) on the car and why it matches the pearson"
   },`;
 
 export default claudeMessage;
