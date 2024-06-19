@@ -49,8 +49,11 @@ export class MobiledeCarsService {
     };
 
     try {
+      console.log('Requesting URL:', url);
       const response = await axios.get(url, { headers });
       const html = response.data;
+      console.log('HTML received:', html);
+
       const $ = cheerio.load(html);
 
       const cars = [];
@@ -91,7 +94,10 @@ export class MobiledeCarsService {
         cars,
       };
     } catch (error) {
-      console.error(`There was an error fetching the data: ${error}`);
+      console.error(`Error status: ${error.response?.status}`);
+      console.error(`Error data: ${error.response?.data}`);
+      console.error(`Axios Error: ${error.message}`);
+      console.error(`Full error: ${error}`);
       throw new InternalServerErrorException('Failed to fetch cars');
     }
   }
