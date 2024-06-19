@@ -77,6 +77,7 @@ export class MobiledeCarsService {
           .parent()
           .text()
           .trim();
+        // const imgSrc = $(element).find('img.img-thumbnail').attr('src');
         const imgSrc = $(element).find('img.img-lazy').attr('src');
         const href = $(element).find('a.vehicle-data').attr('href');
 
