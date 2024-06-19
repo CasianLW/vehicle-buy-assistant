@@ -52,6 +52,7 @@ export class MobiledeCarsService {
       console.log('Requesting URL:', url);
       const response = await axios.get(url, { headers });
       const html = response.data;
+      console.log('response received:', response);
       console.log('HTML received:', html);
 
       const $ = cheerio.load(html);
