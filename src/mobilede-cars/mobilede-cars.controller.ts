@@ -1,11 +1,13 @@
 import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
 import { MobiledeCarsService } from './mobilede-cars.service';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('mobilede-cars')
 export class MobiledeCarsController {
   constructor(private readonly mobiledeCarsService: MobiledeCarsService) {}
 
   @Get()
+  @Public()
   async getCars(
     @Query('make') make: string,
     @Query('model') model: string,
