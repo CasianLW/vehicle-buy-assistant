@@ -8,11 +8,13 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { VehicleService } from './vehicle.service';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('vehicles')
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
+  @Public()
   @Post('process')
   @HttpCode(HttpStatus.OK)
   async processPrompt(
