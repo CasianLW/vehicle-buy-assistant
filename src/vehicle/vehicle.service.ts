@@ -1,4 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { HistoryService } from '../history/history.service';
@@ -196,7 +200,7 @@ export class VehicleService {
     try {
       // const aiResponse = await this.fetchAIResponse(service, prompt);
       const aiResponse = await this.fetchAIResponse(prompt, userLogged);
-      if (userId) {
+      if (userId && userLogged) {
         await this.historyService.createHistory(
           userId,
           userLogged,
@@ -204,7 +208,15 @@ export class VehicleService {
           aiResponse,
         );
       }
-      return aiResponse;
+      // return aiResponse;
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(aiResponse);
+      } catch (error) {
+        this.logger.error('Failed to parse AI response as JSON', error);
+        throw new InternalServerErrorException('Failed to parse AI response');
+      }
+      return parsedResponse;
     } catch (error) {
       this.logger.error(`Processing prompt failed: ${error.message}`);
       throw new Error('Error processing prompt. Please try again later.');
