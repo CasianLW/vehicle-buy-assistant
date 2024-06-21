@@ -1,0 +1,75 @@
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import * as puppeteer from 'puppeteer';
+
+@Injectable()
+export class MobiledeCarsService {
+  private readonly baseUrl = 'https://www.automobile.fr/voiture/';
+
+  async fetchCars(
+    make: string,
+    model: string,
+    year: string,
+    filters: any = {},
+  ): Promise<any> {
+    if (!make || !model || !year) {
+      throw new BadRequestException(
+        'Make, model, and year are required parameters.',
+      );
+    }
+
+    const url =
+      `${this.baseUrl}${make}-${model}/vhc:car,` +
+      Object.entries({
+        srt: 'price',
+        sro: 'asc',
+        dmg: 'false',
+        frn: year,
+        ...filters,
+      })
+        .map(([key, value]) => `${key}:${value}`)
+        .join(',');
+
+    try {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.goto(url, { waitUntil: 'networkidle0' });
+      const html = await page.content();
+      console.log(html); // This will show you the HTML content of the page
+
+      await page.waitForSelector('img.img-thumbnail', { visible: true });
+
+      const cars = await page.evaluate(() => {
+        const entries = Array.from(document.querySelectorAll('.list-entry'));
+        return entries.map((entry) => {
+          const titleElement = entry.querySelector('.vehicle-title');
+          const priceElement = entry.querySelector('.seller-currency');
+          const imgElement = entry.querySelector('img.img-thumbnail');
+          const linkElement = entry.querySelector('a.vehicle-data');
+
+          const title = titleElement
+            ? (titleElement as HTMLElement).innerText.trim()
+            : '';
+          const price = priceElement
+            ? (priceElement as HTMLElement).innerText.trim()
+            : '';
+          const imgSrc = imgElement ? (imgElement as HTMLImageElement).src : '';
+          const href = linkElement
+            ? (linkElement as HTMLAnchorElement).href
+            : '';
+
+          return { title, price, imgSrc, href };
+        });
+      });
+
+      await browser.close();
+      return cars;
+    } catch (error) {
+      console.error('Failed to fetch cars', error);
+      throw new InternalServerErrorException('Failed to fetch cars');
+    }
+  }
+}
