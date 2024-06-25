@@ -23,7 +23,15 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Public } from '../auth/public.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -32,6 +40,22 @@ export class UserController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({ whitelist: true }))
+  @ApiOperation({
+    summary: 'Create a new user',
+    description:
+      'Creates a new user and handles conflicts if the username or email already exists.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully created',
+    type: CreateUserDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflict, username or email already exists',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiBody({ type: CreateUserDto, description: 'Payload to create a new user' })
   async create(@Body() createUserDto: CreateUserDto) {
     try {
       const user = await this.userService.create(createUserDto);
@@ -51,6 +75,15 @@ export class UserController {
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
+  @ApiOperation({
+    summary: 'Find one user',
+    description:
+      'Retrieves a user by ID. Accessible only by users with Admin role.',
+  })
+  @ApiResponse({ status: 200, description: 'User found', type: CreateUserDto })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiParam({ name: 'id', type: String, description: 'User ID' })
   async findOne(@Param('id') id: string) {
     try {
       const user = await this.userService.findById(id);
@@ -71,6 +104,25 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @ApiOperation({
+    summary: 'Update a user',
+    description:
+      'Updates a user by ID. Handles conflicts and not found errors. Accessible only by users with Admin role.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully updated',
+    type: UpdateUserDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflict, username or email already exists',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiParam({ name: 'id', type: String, description: 'User ID' })
+  @ApiBody({ type: UpdateUserDto, description: 'Payload to update a user' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     try {
       const user = await this.userService.update(id, updateUserDto);
@@ -93,6 +145,15 @@ export class UserController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
+  @ApiOperation({
+    summary: 'Delete a user',
+    description:
+      'Deletes a user by ID. Handles not found errors. Accessible only by users with Admin role.',
+  })
+  @ApiResponse({ status: 200, description: 'User successfully deleted' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiParam({ name: 'id', type: String, description: 'User ID' })
   async remove(@Param('id') id: string) {
     try {
       const result = await this.userService.delete(id);
