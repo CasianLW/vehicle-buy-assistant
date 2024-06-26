@@ -3,6 +3,7 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -41,25 +42,32 @@ export class CreateUserDto {
   email: string;
 
   @IsArray()
-  @IsNotEmpty()
+  // @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     type: [String],
     description: 'List of roles assigned to the user',
-    required: true,
+    required: false,
+    default: ['User'],
   })
-  readonly roles: string[];
+  // readonly roles: string[];
+  roles: string[];
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     description: 'Whether the user is banned from the platform',
     required: true,
+    default: false,
   })
   isBanned: boolean;
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     description: 'Whether the user has premium access',
     required: true,
+    default: false,
   })
   isPremium: boolean;
 }
