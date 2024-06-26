@@ -59,7 +59,8 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
     createUserDto.password = hashedPassword;
 
-    return this.userService.create(createUserDto);
+    const newUser = await this.userService.create(createUserDto);
+    return this.login(newUser);
   }
 
   async googleLogin(req) {
