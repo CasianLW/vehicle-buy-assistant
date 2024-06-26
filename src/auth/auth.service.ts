@@ -6,16 +6,25 @@ import {
   ConflictException,
   Injectable,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
+import { EmailService } from 'src/email/email.service';
+import { UserDocument } from 'src/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
+  private resetTokens = new Map<string, { code: string; expires: number }>();
+
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(
+    username: string,
+    password: string,
+  ): Promise<UserDocument | null> {
     const user = await this.userService.findByUsername(username);
     if (user && (await bcrypt.compare(password, user.password))) {
       return user;
@@ -23,10 +32,10 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async login(user: UserDocument) {
     const payload = {
       username: user.username,
-      sub: user._id,
+      sub: user._id.toHexString(),
       roles: user.roles,
     };
     return {
@@ -38,7 +47,6 @@ export class AuthService {
     const existingUser = await this.userService.findByUsername(
       createUserDto.username,
     );
-    // console.log(existingUser);
     if (existingUser) {
       throw new ConflictException('Username already exists');
     }
@@ -74,19 +82,54 @@ export class AuthService {
     userProfile: any,
     provider: string,
   ): Promise<string> {
-    // const email = userProfile.emails[0].value; // Or however the email is passed from the profile
-    const user = await this.userService.findOrCreateOAuthUser(
+    const user = (await this.userService.findOrCreateOAuthUser(
       userProfile,
       provider,
-    );
+    )) as UserDocument;
     if (!user) {
       throw new UnauthorizedException('User not found or created');
     }
     const payload = {
       username: user.username,
-      sub: user._id,
+      sub: user._id.toHexString(),
       roles: user.roles,
     };
     return this.jwtService.sign(payload);
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Email not found');
+    }
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    this.resetTokens.set(email, { code, expires });
+    await this.emailService.sendMail(
+      email,
+      'Password Reset Code',
+      `Your password reset code is ${code}`,
+    );
+  }
+
+  async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+    confirmPassword: string,
+  ) {
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    const token = this.resetTokens.get(email);
+    if (!token || token.code !== code || Date.now() > token.expires) {
+      throw new UnauthorizedException('Invalid or expired reset code');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    await this.userService.updatePassword(email, hashedPassword);
+    this.resetTokens.delete(email);
   }
 }

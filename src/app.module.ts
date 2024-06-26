@@ -19,6 +19,8 @@ import { AppSettingsModule } from './app-settings/app-settings.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { UserController } from './user/user.controller';
+import { EmailService } from './email/email.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { UserController } from './user/user.controller';
     AppSettingsModule,
     AuthModule,
     UserModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [
     AppController,
@@ -37,7 +40,7 @@ import { UserController } from './user/user.controller';
     UserController,
     // AuthController,
   ],
-  providers: [AppService, MobiledeCarsService],
+  providers: [AppService, MobiledeCarsService, EmailService],
   // providers: [AppService, MobiledeCarsService, UserService, AuthService],
 })
 export class AppModule {}

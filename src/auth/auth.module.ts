@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalStrategy } from './local-strategy';
+import { EmailService } from 'src/email/email.service';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LocalStrategy } from './local-strategy';
     AuthService,
     JwtStrategy,
     LocalStrategy, // Add LocalStrategy to providers
+    EmailService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

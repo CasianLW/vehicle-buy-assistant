@@ -46,7 +46,7 @@ export class UserService {
     return user;
   }
 
-  async findByUsername(username: string): Promise<User> {
+  async findByUsername(username: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({ username }).exec();
     // if (!user) {
     //   throw new NotFoundException(`User with username ${username} not found`);
@@ -54,7 +54,14 @@ export class UserService {
     // return user;
     return user || null;
   }
-  async findOrCreateOAuthUser(profile: any, provider: string): Promise<User> {
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.userModel.findOne({ email }).exec();
+    return user || null;
+  }
+  async findOrCreateOAuthUser(
+    profile: any,
+    provider: string,
+  ): Promise<UserDocument> {
     const email =
       profile.emails && profile.emails.length > 0
         ? profile.emails[0].value
@@ -108,5 +115,14 @@ export class UserService {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return { message: 'User successfully deleted' };
+  }
+
+  async updatePassword(email: string, hashedPassword: string): Promise<void> {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    user.password = hashedPassword;
+    await user.save();
   }
 }
