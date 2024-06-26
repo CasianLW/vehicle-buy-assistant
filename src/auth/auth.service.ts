@@ -34,13 +34,19 @@ export class AuthService {
     const existingUser = await this.userService.findByUsername(
       createUserDto.username,
     );
+    // console.log(existingUser);
     if (existingUser) {
       throw new ConflictException('Username already exists');
     }
 
+    createUserDto.roles = createUserDto.roles || ['User'];
+    createUserDto.isBanned = createUserDto.isBanned || false;
+    createUserDto.isPremium = createUserDto.isPremium || false;
+
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
     createUserDto.password = hashedPassword;
+
     return this.userService.create(createUserDto);
   }
 }
