@@ -92,8 +92,11 @@ export class AuthService {
     }
     const payload = {
       username: user.username,
-      sub: user._id.toHexString(),
+      userId: user._id.toHexString(),
       roles: user.roles,
+      email: user.email,
+      isBanned: user.isBanned,
+      isPremium: user.isPremium,
     };
     return this.jwtService.sign(payload);
   }
