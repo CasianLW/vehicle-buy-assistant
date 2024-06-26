@@ -9,6 +9,7 @@ import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from '../schemas/user.schema';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -52,6 +53,28 @@ export class UserService {
     // }
     // return user;
     return user || null;
+  }
+  async findOrCreateOAuthUser(profile: any, provider: string): Promise<User> {
+    const email =
+      profile.emails && profile.emails.length > 0
+        ? profile.emails[0].value
+        : null;
+    if (!email) {
+      throw new Error('Email is required for OAuth registration');
+    }
+
+    let user = await this.userModel.findOne({ email }).exec();
+    if (!user) {
+      const password = await bcrypt.hash(profile.id + provider, 10); // Using provider in hash for added uniqueness
+      user = new this.userModel({
+        username: profile.displayName || profile.username || email,
+        email,
+        password: password,
+      });
+      await user.save();
+    }
+
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
