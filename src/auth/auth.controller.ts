@@ -22,7 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RateLimit } from 'nestjs-rate-limiter';
+// import { RateLimit } from 'nestjs-rate-limiter';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
@@ -144,7 +144,7 @@ export class AuthController {
   }
 
   @Public()
-  @RateLimit({ points: 10, duration: 60 * 60 }) // 10 requests per hour
+  // @RateLimit({ points: 10, duration: 60 * 60 }) // 10 requests per hour
   @Post('forgot-password')
   @ApiOperation({
     summary: 'Forgot Password',
