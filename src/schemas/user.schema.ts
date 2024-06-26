@@ -1,11 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
 @Schema()
 export class User {
+  @Prop({ type: Types.ObjectId, required: true, auto: true })
+  _id: Types.ObjectId;
+
   @Prop({ required: true, unique: true })
   @ApiProperty({
     description: 'Username of the user, must be unique.',
