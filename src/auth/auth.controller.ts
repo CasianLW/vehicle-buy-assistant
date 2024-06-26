@@ -4,13 +4,22 @@ import {
   Body,
   UseGuards,
   UnauthorizedException,
+  Get,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './public.decorator';
 import { LocalAuthGuard } from './local-auth.guard';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -73,5 +82,58 @@ export class AuthController {
     if (!user) throw new UnauthorizedException('Invalid credentials');
     return this.authService.login(user);
     // return this.authService.login(req.user);
+  }
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiExcludeEndpoint()
+  @ApiOperation({
+    summary: 'Google OAuth Login',
+    description: 'Redirects to Google for authentication.',
+  })
+  @ApiResponse({ status: 302, description: 'Redirect to Google.' })
+  async googleAuth() {
+    // Passport handles the redirect
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  @ApiExcludeEndpoint()
+  @ApiOperation({
+    summary: 'Google OAuth Callback',
+    description: 'Handles the callback from Google OAuth.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Authentication successful, returns JWT.',
+  })
+  async googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req);
+  }
+
+  @Get('facebook')
+  @UseGuards(AuthGuard('facebook'))
+  @ApiExcludeEndpoint()
+  @ApiOperation({
+    summary: 'Facebook OAuth Login',
+    description: 'Redirects to Facebook for authentication.',
+  })
+  @ApiResponse({ status: 302, description: 'Redirect to Facebook.' })
+  async facebookAuth() {
+    // Passport handles the redirect
+  }
+
+  @Get('facebook/callback')
+  @UseGuards(AuthGuard('facebook'))
+  @ApiExcludeEndpoint()
+  @ApiOperation({
+    summary: 'Facebook OAuth Callback',
+    description: 'Handles the callback from Facebook OAuth.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Authentication successful, returns JWT.',
+  })
+  async facebookAuthRedirect(@Req() req) {
+    return this.authService.facebookLogin(req);
   }
 }
