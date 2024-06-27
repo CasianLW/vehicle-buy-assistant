@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
 import { UserDocument } from 'src/schemas/user.schema';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -33,13 +34,18 @@ export class AuthService {
   }
 
   async login(user: UserDocument) {
-    const payload = {
+    const payload: JwtPayload = {
       username: user.username,
-      sub: user._id.toHexString(),
+      userId: user._id.toHexString(),
       roles: user.roles,
+      email: user.email,
+      isBanned: user.isBanned,
+      isPremium: user.isPremium,
     };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        expiresIn: '7d',
+      }),
     };
   }
 
