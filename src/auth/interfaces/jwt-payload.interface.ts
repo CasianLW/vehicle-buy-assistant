@@ -1,5 +1,8 @@
 export interface JwtPayload {
   username: string;
-  sub: string;
+  userId: string;
   roles: string[];
+  email: string;
+  isBanned: boolean;
+  isPremium: boolean;
 }
