@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './public.decorator';
-import { LocalAuthGuard } from './local-auth.guard';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import {
   ApiBody,
@@ -20,11 +19,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 // import { RateLimit } from 'nestjs-rate-limiter';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -57,35 +56,48 @@ export class AuthController {
   }
 
   @Public()
-  @UseGuards(LocalAuthGuard)
   @Post('login')
   @ApiOperation({
-    summary: 'User login',
+    summary: 'Authenticate user',
     description:
-      'Authenticates a user based on username and password and returns an access token.',
+      'Logs in a user by email and password, returning a JWT for authenticated sessions.',
+  })
+  @ApiBody({
+    description: 'The credentials needed to log in',
+    type: LoginDto,
   })
   @ApiResponse({
     status: 200,
-    description: 'User logged in successfully.',
-    type: 'object',
+    description: 'Login successful, JWT provided',
     schema: {
+      type: 'object',
       properties: {
-        access_token: { type: 'string', description: 'JWT access token' },
+        access_token: {
+          type: 'string',
+          description: 'JWT access token used for authenticated requests',
+        },
       },
     },
   })
   @ApiResponse({
     status: 401,
-    description: 'Unauthorized, invalid credentials.',
-    type: UnauthorizedException,
+    description: 'Unauthorized, invalid credentials provided',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 401 },
+        message: { type: 'string', example: 'Invalid credentials' },
+      },
+    },
   })
-  @ApiBody({ type: LoginDto, description: 'Credentials needed to login' })
   async login(@Body() loginDto: LoginDto) {
     const user = await this.authService.validateUser(
-      loginDto.username,
+      loginDto.email,
       loginDto.password,
     );
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
     return this.authService.login(user);
   }
 
