@@ -3,7 +3,7 @@ import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import {
-  ConflictException,
+  // ConflictException,
   Injectable,
   UnauthorizedException,
   BadRequestException,
@@ -23,10 +23,10 @@ export class AuthService {
   ) {}
 
   async validateUser(
-    username: string,
+    email: string,
     password: string,
   ): Promise<UserDocument | null> {
-    const user = await this.userService.findByUsername(username);
+    const user = await this.userService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       return user;
     }
@@ -50,12 +50,20 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto) {
-    const existingUser = await this.userService.findByUsername(
-      createUserDto.username,
-    );
-    if (existingUser) {
-      throw new ConflictException('Username already exists');
-    }
+    // logic inside the create method
+    // const existingUser = await this.userService.findByUsername(
+    //   createUserDto.username,
+    // );
+    // if (existingUser) {
+    //   throw new ConflictException('Username already exists');
+    // } else {
+    //   const existingUser = await this.userService.findByEmail(
+    //     createUserDto.email,
+    //   );
+    //   if (existingUser) {
+    //     throw new ConflictException('Email already exists');
+    //   }
+    // }
 
     createUserDto.roles = createUserDto.roles || ['User'];
     createUserDto.isBanned = createUserDto.isBanned || false;
