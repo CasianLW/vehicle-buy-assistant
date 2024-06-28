@@ -3337,23 +3337,26 @@ keep all those infos in mind:
   }
 }
 
-Give me a response in json format, array of objects,no other textes or infos around
+Give me a response in json format, array of objects,no other textes or infos around except of 'respectedFilters:boolean' that tells if you researches could match the filters or not
+If cannot respect filters in prompt, you can enlarge them to get results, set respectedFilters to false in that case
 Example:
-[
-  {
-    "make": "Volkswagen",
-    "makeId": 25200, 
-    "model": "Golf",
-    "modelId": 14,
-    "year": 2018,
-    "price": 15000,
-    "consumption": 5.5, 
-    "fuel_cost": 1.5, 
-    "annual_maintenance": 500, 
-    "registration_cost": 250, 
-    "estimated_insurance": 700, 
-    "max_km":2000000,
-    "description":"A short description (max 40 words) on the car and why it matches the pearson"
-  },`;
+{
+    "respectedFilterd": boolean,
+    "vehicles": [
+    {
+      "make": "Volkswagen",
+      "makeId": 999999, 
+      "model": "Golf",
+      "modelId": 999999,
+      "year": 2018,
+      "price": 15000,
+      "consumption": 5.5, 
+      "fuel_cost": 1.5, 
+      "annual_maintenance": 500, 
+      "registration_cost": 250, 
+      "estimated_insurance": 700, 
+      "max_km":2000000,
+      "description":"A short description (max 40 words) on the car and why it matches the pearson in French"
+    },...`;
 
 export default claudeMessage;
