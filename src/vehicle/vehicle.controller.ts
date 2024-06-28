@@ -40,7 +40,7 @@ export class VehicleController {
         value: {
           userId: '123',
           userLogged: false,
-          prompt: `Marie 40 ans mère de 2 enfants, veut acheter une nouvelle voiture qu'elle compte utiliser en daily pour aller ses enfants à l'école, faire les courses etc. Quelle voiture recommandez-vous? Donne moi une liste avec les details des voitures trouvées (entre 4 et 10).`,
+          prompt: `Marie 40 ans mère de 2 enfants, veut acheter une nouvelle voiture qu'elle compte utiliser en daily pour aller ses enfants à l'école, faire les courses etc.`,
         },
       },
     },
@@ -52,7 +52,9 @@ export class VehicleController {
       const response = await this.vehicleService.processPrompt(
         body.userId,
         body.userLogged,
-        body.prompt,
+        body.prompt +
+          '' +
+          'Quelle voitures recommandez-vous? Donne moi une liste avec les details des voitures trouvées (entre 3 et 6).',
       );
       return {
         statusCode: HttpStatus.OK,
