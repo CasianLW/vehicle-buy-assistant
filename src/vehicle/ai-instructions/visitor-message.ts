@@ -7,9 +7,9 @@ Example:
     "vehicles": [
     {
       "make": "Volkswagen",
-      "makeId": 999999, 
+      "makeId": 25200, 
       "model": "Golf",
-      "modelId": 999999,
+      "modelId": 14,
       "year": 2018,
       "price": 15000,
       "consumption": 5.5, 
@@ -17,12 +17,13 @@ Example:
       "annual_maintenance": 500, 
       "registration_cost": 250, 
       "estimated_insurance": 700, 
-      "max_km":2000000,
+      "max_km":200000,
       "description":"A short description (max 40 words) on the car and why it matches the pearson in French"
     },...
     
-    For the ids check this list:
-    Cupra-3:Ateca(2),Ibiza(3),Arona(4),Formentor(5),Leon(6),Born(7)
+Match ids to correct make and model STRICTLLY
+For the ids check this list:
+Cupra-3:Ateca(2),Ibiza(3),Arona(4),Formentor(5),Leon(6),Born(7)
 Polestar-4:1(2),2(3),3(4),4(5)
 Alpine-5:A110(2)
 Chatenet-83:Autres(1)
