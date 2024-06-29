@@ -53,7 +53,7 @@ export class VehicleController {
         body.userId,
         body.userLogged,
         body.prompt +
-          '' +
+          ` ` +
           'Quelle voitures recommandez-vous? Donne moi une liste avec les details des voitures trouvées (entre 3 et 6).',
       );
       return {
