@@ -155,14 +155,13 @@ describe('UserService', () => {
       expect(result).toEqual(user);
     });
 
-    it('should throw a not found exception if user is not found', async () => {
+    it('should return null if user is not found', async () => {
       jest.spyOn(model, 'findOne').mockReturnValueOnce({
         exec: jest.fn().mockResolvedValue(null),
       } as any);
 
-      await expect(service.findByUsername('testuser')).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = await service.findByUsername('testuser');
+      expect(result).toBeNull();
     });
   });
 
