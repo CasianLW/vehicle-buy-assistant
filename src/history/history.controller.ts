@@ -14,7 +14,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { History } from 'src/schemas/history.schema';
+import { History } from '../schemas/history.schema';
 @ApiTags('history')
 @Controller('history')
 export class HistoryController {
