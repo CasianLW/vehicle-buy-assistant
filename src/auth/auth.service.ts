@@ -8,8 +8,8 @@ import {
   UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
-import { EmailService } from 'src/email/email.service';
-import { UserDocument } from 'src/schemas/user.schema';
+import { EmailService } from '../email/email.service';
+import { UserDocument } from '../schemas/user.schema';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
