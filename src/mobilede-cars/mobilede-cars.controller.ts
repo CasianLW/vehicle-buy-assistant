@@ -1,6 +1,6 @@
 import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
 import { MobiledeCarsService } from './mobilede-cars.service';
-import { Public } from 'src/auth/public.decorator';
+import { Public } from '../auth/public.decorator';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('mobilede-cars')
