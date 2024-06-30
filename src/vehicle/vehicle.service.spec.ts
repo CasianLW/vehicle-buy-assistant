@@ -82,10 +82,14 @@ describe('VehicleService', () => {
       jest.spyOn(service, 'fetchOpenAIResponse').mockResolvedValue('response');
       mockAppSettings.aiSelected = 'openai';
 
-      const result = await service.fetchAIResponse('prompt', true);
+      const result = await service.fetchAIResponse('prompt', true, false);
 
       expect(result).toBe('response');
-      expect(service.fetchOpenAIResponse).toHaveBeenCalledWith('prompt', true);
+      expect(service.fetchOpenAIResponse).toHaveBeenCalledWith(
+        'prompt',
+        true,
+        false,
+      );
     });
 
     it('should call fetchMistralAIResponse when aiSelected is mistral', async () => {
@@ -94,12 +98,13 @@ describe('VehicleService', () => {
         .mockResolvedValue('response');
       mockAppSettings.aiSelected = 'mistral';
 
-      const result = await service.fetchAIResponse('prompt', true);
+      const result = await service.fetchAIResponse('prompt', true, false);
 
       expect(result).toBe('response');
       expect(service.fetchMistralAIResponse).toHaveBeenCalledWith(
         'prompt',
         true,
+        false,
       );
     });
 
@@ -109,47 +114,59 @@ describe('VehicleService', () => {
         .mockResolvedValue('response');
       mockAppSettings.aiSelected = 'claude';
 
-      const result = await service.fetchAIResponse('prompt', true);
+      const result = await service.fetchAIResponse('prompt', true, false);
 
       expect(result).toBe('response');
       expect(service.fetchClaudeAIResponse).toHaveBeenCalledWith(
         'prompt',
         true,
+        false,
       );
     });
 
     it('should throw an error for unsupported AI service', async () => {
       mockAppSettings.aiSelected = 'unsupported';
 
-      await expect(service.fetchAIResponse('prompt', true)).rejects.toThrow(
-        'Unsupported AI service',
-      );
+      await expect(
+        service.fetchAIResponse('prompt', true, false),
+      ).rejects.toThrow('Unsupported AI service');
     });
   });
   describe('processPrompt', () => {
     it('should call fetchAIResponse and createHistory', async () => {
-      jest.spyOn(service, 'fetchAIResponse').mockResolvedValue('response');
+      const aiResponse = '{"response": "AI response text"}';
+      jest.spyOn(service, 'fetchAIResponse').mockResolvedValue(aiResponse);
       jest.spyOn(historyService, 'createHistory').mockResolvedValue(null);
 
-      const result = await service.processPrompt('userId', true, 'prompt');
+      // Act: Call the processPrompt method.
+      const result = await service.processPrompt(
+        'userId',
+        true,
+        'prompt',
+        false,
+      );
 
-      expect(result).toBe('response');
-      expect(service.fetchAIResponse).toHaveBeenCalledWith('prompt', true);
+      // Assert: Check if the result is as expected.
+      expect(result).toEqual({ response: 'AI response text' });
+      expect(service.fetchAIResponse).toHaveBeenCalledWith(
+        'prompt',
+        true,
+        false,
+      );
       expect(historyService.createHistory).toHaveBeenCalledWith(
         'userId',
         true,
         'prompt',
-        'response',
+        aiResponse,
       );
     });
-
     it('should throw an error if fetchAIResponse fails', async () => {
       jest
         .spyOn(service, 'fetchAIResponse')
         .mockRejectedValue(new Error('Error processing prompt'));
 
       await expect(
-        service.processPrompt('userId', true, 'prompt'),
+        service.processPrompt('userId', true, 'prompt', false),
       ).rejects.toThrow('Error processing prompt');
     });
   });
