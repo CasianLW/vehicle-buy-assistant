@@ -43,7 +43,8 @@ describe('VehicleController', () => {
       expect(service.processPrompt).toHaveBeenCalledWith(
         'userId',
         true,
-        'prompt',
+        'prompt Quelle voitures recommandez-vous? Donne moi une liste avec les details des voitures trouvées (entre 3 et 6).',
+        false,
       );
     });
 
