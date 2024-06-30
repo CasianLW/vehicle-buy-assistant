@@ -21,7 +21,7 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AppSettings } from 'src/schemas/app-settings.schema';
+import { AppSettings } from '../schemas/app-settings.schema';
 
 @ApiTags('app-settings')
 @Controller('app-settings')
