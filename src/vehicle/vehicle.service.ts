@@ -8,12 +8,13 @@ import { ConfigService } from '@nestjs/config';
 import { HistoryService } from '../history/history.service';
 import { lastValueFrom } from 'rxjs';
 import Anthropic from '@anthropic-ai/sdk';
-import claudeMessage from './ai-instructions/claude-message';
-import mistralMessage from './ai-instructions/mistral-message';
+import claudeMessage from './ai-instructions/vehicle/claude-message';
+import mistralMessage from './ai-instructions/vehicle/mistral-message';
 import OpenAI from 'openai';
 import { AppSettingsService } from '../app-settings/app-settings.service';
-import visitorMessage from './ai-instructions/visitor-message';
-import openaiMessage from './ai-instructions/openai-message';
+import visitorMessage from './ai-instructions/vehicle/visitor-message';
+import openaiMessage from './ai-instructions/vehicle/openai-message';
+import rapportMessage from './ai-instructions/rapport/rapport-message';
 
 @Injectable()
 export class VehicleService {
@@ -36,9 +37,15 @@ export class VehicleService {
   public async fetchOpenAIResponse(
     prompt: string,
     userLogged: boolean,
+    isRapport: boolean,
   ): Promise<string> {
     this.logger.debug(`Fetching OpenAI response for prompt: ${prompt}`);
     try {
+      const contextChosen = isRapport
+        ? rapportMessage
+        : userLogged
+          ? openaiMessage
+          : visitorMessage;
       const settings = await this.appSettingsService.getAppSettings();
       const model = settings.modelForOpenAI || 'gpt-3.5-turbo';
       const completion = await this.openai.chat.completions.create({
@@ -47,7 +54,8 @@ export class VehicleService {
         messages: [
           {
             role: 'system',
-            content: userLogged ? openaiMessage : visitorMessage,
+            content: contextChosen,
+            // content: userLogged ? openaiMessage : visitorMessage,
           },
           { role: 'user', content: prompt },
         ],
@@ -77,10 +85,16 @@ export class VehicleService {
   public async fetchMistralAIResponse(
     prompt: string,
     userLogged: boolean,
+    isRapport: boolean,
   ): Promise<string> {
     const mistralAiKey = this.configService.get<string>('MISTRAL_API_KEY');
     this.logger.debug(`Fetching Mistral AI response for prompt: ${prompt}`);
     try {
+      const contextChosen = isRapport
+        ? rapportMessage
+        : userLogged
+          ? mistralMessage
+          : visitorMessage;
       const settings = await this.appSettingsService.getAppSettings();
       const model = settings.modelForMistral || 'open-mistral-7b';
       const response = await lastValueFrom(
@@ -94,7 +108,8 @@ export class VehicleService {
             messages: [
               {
                 role: 'system',
-                content: userLogged ? mistralMessage : visitorMessage,
+                content: contextChosen,
+                // content: userLogged ? mistralMessage : visitorMessage,
               },
               { role: 'user', content: prompt },
             ],
@@ -135,9 +150,15 @@ export class VehicleService {
   public async fetchClaudeAIResponse(
     prompt: string,
     userLogged: boolean,
+    isRapport: boolean,
   ): Promise<string> {
     this.logger.debug(`Fetching Claude AI response for prompt: ${prompt}`);
     try {
+      const contextChosen = isRapport
+        ? rapportMessage
+        : userLogged
+          ? claudeMessage
+          : visitorMessage;
       const settings = await this.appSettingsService.getAppSettings();
       const model = settings.modelForClaude || 'claude-3-haiku-20240307';
       const response = await this.anthropic.messages.create({
@@ -148,7 +169,8 @@ export class VehicleService {
         max_tokens: 2000,
         temperature: 0,
         // system: mistralMessage,
-        system: userLogged ? claudeMessage : visitorMessage,
+        system: contextChosen,
+        // system: userLogged ? claudeMessage : visitorMessage,
         messages: [
           {
             role: 'user',
@@ -177,15 +199,19 @@ export class VehicleService {
   }
 
   // async fetchAIResponse(service: string, prompt: string): Promise<string> {
-  async fetchAIResponse(prompt: string, userLogged: boolean): Promise<string> {
+  async fetchAIResponse(
+    prompt: string,
+    userLogged: boolean,
+    isRapport: boolean,
+  ): Promise<string> {
     const settings = await this.appSettingsService.getAppSettings();
     const service = settings.aiSelected;
     if (service === 'openai') {
-      return this.fetchOpenAIResponse(prompt, userLogged);
+      return this.fetchOpenAIResponse(prompt, userLogged, isRapport);
     } else if (service === 'mistral') {
-      return this.fetchMistralAIResponse(prompt, userLogged);
+      return this.fetchMistralAIResponse(prompt, userLogged, isRapport);
     } else if (service === 'claude') {
-      return this.fetchClaudeAIResponse(prompt, userLogged);
+      return this.fetchClaudeAIResponse(prompt, userLogged, isRapport);
     } else {
       throw new Error('Unsupported AI service');
     }
@@ -196,11 +222,16 @@ export class VehicleService {
     userLogged: boolean,
     // service: string,
     prompt: string,
+    isRapport: boolean,
   ): Promise<string> {
     try {
       // const aiResponse = await this.fetchAIResponse(service, prompt);
-      const aiResponse = await this.fetchAIResponse(prompt, userLogged);
-      if (userId && userLogged) {
+      const aiResponse = await this.fetchAIResponse(
+        prompt,
+        userLogged,
+        isRapport,
+      );
+      if (userId && userLogged && !isRapport) {
         await this.historyService.createHistory(
           userId,
           userLogged,
@@ -208,6 +239,7 @@ export class VehicleService {
           aiResponse,
         );
       }
+
       // return aiResponse;
       let parsedResponse;
       try {
