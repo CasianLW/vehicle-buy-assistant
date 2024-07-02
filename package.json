@@ -84,14 +84,20 @@
       "json",
       "ts"
     ],
+    "collectCoverageFrom": [
+      "**/*.{js,ts}",
+      "!**/*.module.{js,ts}",
+      "!**/schemas/*.ts",
+      "!**/main.ts",
+      "!**/*.guard.{js,ts}",
+      "!**/*.strategy.{js,ts}",
+      "!**/*-strategy.{js,ts}"
+    ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
