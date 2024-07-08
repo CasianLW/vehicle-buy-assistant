@@ -7,6 +7,7 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  // Logger,
 } from '@nestjs/common';
 import { EmailService } from '../email/email.service';
 import { UserDocument } from '../schemas/user.schema';
@@ -34,6 +35,9 @@ export class AuthService {
   }
 
   async login(user: UserDocument) {
+    // const logger = new Logger('logging');
+    // logger.error(`logging...`);
+
     const payload: JwtPayload = {
       username: user.username,
       userId: user._id.toHexString(),
