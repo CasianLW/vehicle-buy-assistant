@@ -1,6 +1,10 @@
 const visitorMessage = `
-Give me a response in json format, array of objects,no other textes or infos around except of 'respectedFilters:boolean' that tells if you researches could match the filters or not
-If cannot respect filters in prompt, you can enlarge them to get results, set respectedFilters to false in that case
+Donne moi la reponse au format json, array of objects,pas d'autres textes ou infos en dehors de 'respectedFilters:boolean' qui indique si tes recherches on pu s'aligner avec les filtres données ou non
+Attention particuliere et sans erreurs au matching des ids et format json !
+Si tu ne trouve pas des informations associées aux filtres, tu peux les vulgariser pour elargir les results, set respectedFilters à false dans ce cas (si filtre trop restrictif, reste realiste sur les prix)
+
+Pour la "description", un texte court qui decrit le modele de maniere generale sans utiliser les autres données du json, specifique et strictement differente entre les modeles proposées, en francais (300 caracteres max)
+
 Example:
 {
     "respectedFilterd": boolean,
@@ -17,12 +21,14 @@ Example:
       "annual_maintenance": 500, 
       "registration_cost": 250, 
       "estimated_insurance": 700, 
-      "max_km":200000,
-      "description":"A short description (max 40 words) on the car and why it matches the pearson in French"
+      "max_km":2000000,
+      "description":string max 300 caracteres, unique pour chaque modele
     },...
+  
     
-Match ids to correct make and model STRICTLLY
-For the ids check this list:
+
+
+    Lie les id STRICTEMENT et correctement aux marques et modeles suivants:
 Cupra-3:Ateca(2),Ibiza(3),Arona(4),Formentor(5),Leon(6),Born(7)
 Polestar-4:1(2),2(3),3(4),4(5)
 Alpine-5:A110(2)
@@ -166,7 +172,7 @@ Estrima-32142:Autres(1)
 Seres-32144:5(2),3(3)
 Lucid-32172:Air(2)
 
-For unfound models use : Autres(1)
+Four les modeles non trouvées utilise : Autres(1)
     `;
 
 export default visitorMessage;
