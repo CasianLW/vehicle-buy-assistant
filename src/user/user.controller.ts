@@ -36,6 +36,33 @@ import {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard) // Apply guards as needed based on your security policy
+  @Roles(Role.Admin) // Assuming only admin can view all users, modify as per your role management
+  @ApiOperation({
+    summary: 'Get all users',
+    description:
+      'Retrieves all registered users. Accessible only by users with Admin role.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Users retrieved successfully',
+    type: [CreateUserDto],
+  }) // Assuming CreateUserDto has all fields you wish to expose for the user listing
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async findAll() {
+    try {
+      const users = await this.userService.findAll();
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Users retrieved successfully',
+        data: users,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
